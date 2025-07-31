@@ -1,11 +1,16 @@
 import { Body, Controller, Post, Req, Request, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt.guard";
+import { TokenBlacklistService } from "./token-blacklist.service";
 
 @Controller('auth')
 export class AuthController {
     [x: string]: any;
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private blacklistService: TokenBlacklistService
+
+    ) {}
 
     @UseGuards(JwtAuthGuard)
     @Post('logout')
@@ -18,8 +23,11 @@ export class AuthController {
 
     const token = authHeader.split(' ')[1];
 
-    // Aqui você poderia salvar esse token em uma blacklist, se quisesse.
-    console.log('Token recebido no logout:', token);
+    if (!token) {
+      throw new UnauthorizedException('Token não fornecido');
+    }
+
+    this.blacklistService.add(token);
 
     
 
