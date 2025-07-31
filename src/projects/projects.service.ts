@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { User } from '../users/user.entity';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -26,10 +27,18 @@ export class ProjectsService {
     return this.projectRepository.save(projeto);
   }
 
-  async findAllByUser(userId: number) {
+  findAllByUser(userId: number) {
     return this.projectRepository.find({
       where: { owner: { id: userId } },
       relations: ['tasks'],
     });
+  }
+
+  update(id: number, data: UpdateProjectDto) {
+      return this.projectRepository.update(id, data);
+    }
+
+  remove(id: number) {
+    return this.projectRepository.delete(id);
   }
 }

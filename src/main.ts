@@ -7,6 +7,6 @@ async function bootstrap() {
     origin: 'http://localhost:4200',
     credentials: true
   })
-  await app.listen(8080);
+  await app.listen(process.env.PORT_BACKEND || 8080);
 }
 bootstrap();

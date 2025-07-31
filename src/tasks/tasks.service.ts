@@ -8,9 +8,6 @@ import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class TasksService {
-  findAllByUser(userId: any) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(Task)
     private taskRepo: Repository<Task>,
@@ -37,8 +34,13 @@ export class TasksService {
     return this.taskRepo.save(task)
   }
 
-  findAll() {
-    return this.taskRepo.find({ relations: ['projeto'] });
+  async findAllByUser(userId: number) {
+    return this.taskRepo
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.projeto', 'projeto')
+      .leftJoin('projeto.owner', 'owner')
+      .where('owner.id = :userId', { userId })
+      .getMany();
   }
 
   findOne(id: number) {
