@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -10,13 +10,15 @@ export class TasksController {
   constructor(private readonly service: TasksService) {}
 
   @Post()
-  create(@Body() dto: CreateTaskDto) {
-    return this.service.create(dto);
+  create(@Body() dto: CreateTaskDto, @Req() req) {
+    const userId = req.user.userId
+    return this.service.create(dto, userId);
   }
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Req() req) {
+    const userId = req.user.userId;
+    return this.service.findAllByUser(userId);
   }
 
   @Get(':id')

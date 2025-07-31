@@ -8,6 +8,9 @@ import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class TasksService {
+  findAllByUser(userId: any) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(Task)
     private taskRepo: Repository<Task>,
@@ -15,8 +18,14 @@ export class TasksService {
     private projectRepo: Repository<Project>,
   ) {}
 
-  async create(data: CreateTaskDto) {
-    const project = await this.projectRepo.findOneBy({ id: data.projetoId });
+  async create(data: CreateTaskDto, userId: number) {
+    const project = await this.projectRepo.findOne({ 
+      where: {
+        id: data.projetoId,
+        owner: {id: userId}
+      },
+      relations: ['owner']
+     });
     if (!project) throw new Error('Projeto não encontrado');
 
     const task = this.taskRepo.create({
@@ -25,7 +34,7 @@ export class TasksService {
       projeto: project,
     });
 
-    return this.taskRepo.save(task);
+    return this.taskRepo.save(task)
   }
 
   findAll() {
